@@ -1,115 +1,51 @@
+
 <!DOCTYPE html>
 <html>
 <head>
+
 </head> 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 1. Include action buttons play/stop -->
-<button id="btn-start-recording">Start Recording</button>
-<button id="btn-stop-recording" disabled="disabled">Stop Recording</button>
-<!--
-    2. Include a video element that will display the current video stream
-    and as well to show the recorded video at the end.
- -->
-<hr>
-<video id="my-preview" controls autoplay></video>
-<!-- 3. Include the RecordRTC library and the latest adapter -->
-<script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
-<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-<script> 
-// Store a reference of the preview video element and a global reference to the recorder instance
-    var video = document.getElementById('my-preview');
-    var recorder;
-    // When the user clicks on start video recording
-    document.getElementById('btn-start-recording').addEventListener("click", function(){
-        // Disable start recording button
-        this.disabled = true;
-        // Request access to the media devices
-        navigator.mediaDevices.getUserMedia({
-            audio: true, 
-            video: true
-        }).then(function(stream) {
-            // Display a live preview on the video element of the page
-            setSrcObject(stream, video);
-            // Start to display the preview on the video element
-            // and mute the video to disable the echo issue !
-            video.play();
-            video.muted = true;
-            // Initialize the recorder
-            recorder = new RecordRTCPromisesHandler(stream, {
-                mimeType: 'video/webm',
-                bitsPerSecond: 128000
-            });
-            // Start recording the video
-            recorder.startRecording().then(function() {
-                console.info('Recording video ...');
-            }).catch(function(error) {
-                console.error('Cannot start video recording: ', error);
-            });
-            // release stream on stopRecording
-            recorder.stream = stream;
-            // Enable stop recording button
-            document.getElementById('btn-stop-recording').disabled = false;
-        }).catch(function(error) {
-            console.error("Cannot access media devices: ", error);
-        });
-    }, false);
-    // When the user clicks on Stop video recording
-    document.getElementById('btn-stop-recording').addEventListener("click", function(){
-        this.disabled = true;
-        recorder.stopRecording().then(function() {
-            console.info('stopRecording success');
-            // Retrieve recorded video as blob and display in the preview element
-            var blob = recorder.getBlob();
-            video.src = URL.createObjectURL(blob);
-            video.play();
-            // Unmute video on preview
-            video.muted = false;
-            // Stop the device streaming
-            recorder.stream.stop();
-            // Enable record button again !
-            document.getElementById('btn-start-recording').disabled = false;
-        }).catch(function(error) {
-            console.error('stopRecording failure', error);
-        });
-    }, false);</script>
+
 <style>
     #sig-canvas {
         border: 2px dotted #CCCCCC;
         border-radius: 15px;
         cursor: crosshair;
- </style>
+        </style>
+
 <body>
     <div class="container">
-        <div class="row">
-            
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <canvas id="sig-canvas" width="620" height="160">
-                    Get a better browser, bro.
-                </canvas>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <button class="btn btn-primary" id="sig-submitBtn"  onclick="myFunction()">Submit Signature </button>
-                <button class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
-            </div>
-        </div>
-        <br/>
-        <!-- <div class="row">
-          <div class="col-md-12">
-            <textarea id="sig-dataUrl" class="form-control" rows="5">Data URL for your signature will go here!</textarea>
-          </div>
-        </div> -->
-        <br/>
-        <!-- <div class="row">
-          <div class="col-md-12">
-            <img id="sig-image" src="" alt="Your signature will go here!"/>
-          </div>
-        </div> -->
-    </div>
+		<div class="row">
+			
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+		 		<canvas id="sig-canvas" width="620" height="160">
+		 			Get a better browser, bro.
+		 		</canvas>
+		 	</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<button class="btn btn-primary" id="sig-submitBtn">Submit Signature</button>
+				<button class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
+			</div>
+		</div>
+		<br/>
+		<div class="row">
+			<div class="col-md-12">
+				<textarea id="sig-dataUrl" class="form-control" rows="5">Data URL for your signature will go here!</textarea>
+			</div>
+		</div>
+		<br/>
+		<div class="row">
+			<div class="col-md-12">
+				<img id="sig-image" src="" alt="Your signature will go here!"/>
+			</div>
+		</div>
+	</div>
   <script>
+
     (function() {
   window.requestAnimFrame = (function(callback) {
     return window.requestAnimationFrame ||
@@ -121,29 +57,37 @@
         window.setTimeout(callback, 1000 / 60);
       };
   })();
+
   var canvas = document.getElementById("sig-canvas");
   var ctx = canvas.getContext("2d");
   ctx.strokeStyle = "#222222";
   ctx.lineWidth = 4;
+
   var drawing = false;
   var mousePos = {
     x: 0,
     y: 0
   };
   var lastPos = mousePos;
+
   canvas.addEventListener("mousedown", function(e) {
     drawing = true;
     lastPos = getMousePos(canvas, e);
   }, false);
+
   canvas.addEventListener("mouseup", function(e) {
     drawing = false;
   }, false);
+
   canvas.addEventListener("mousemove", function(e) {
     mousePos = getMousePos(canvas, e);
   }, false);
+
   // Add touch event support for mobile
   canvas.addEventListener("touchstart", function(e) {
+
   }, false);
+
   canvas.addEventListener("touchmove", function(e) {
     var touch = e.touches[0];
     var me = new MouseEvent("mousemove", {
@@ -152,6 +96,7 @@
     });
     canvas.dispatchEvent(me);
   }, false);
+
   canvas.addEventListener("touchstart", function(e) {
     mousePos = getTouchPos(canvas, e);
     var touch = e.touches[0];
@@ -161,10 +106,12 @@
     });
     canvas.dispatchEvent(me);
   }, false);
+
   canvas.addEventListener("touchend", function(e) {
     var me = new MouseEvent("mouseup", {});
     canvas.dispatchEvent(me);
   }, false);
+
   function getMousePos(canvasDom, mouseEvent) {
     var rect = canvasDom.getBoundingClientRect();
     return {
@@ -172,6 +119,7 @@
       y: mouseEvent.clientY - rect.top
     }
   }
+
   function getTouchPos(canvasDom, touchEvent) {
     var rect = canvasDom.getBoundingClientRect();
     return {
@@ -179,6 +127,7 @@
       y: touchEvent.touches[0].clientY - rect.top
     }
   }
+
   function renderCanvas() {
     if (drawing) {
       ctx.moveTo(lastPos.x, lastPos.y);
@@ -187,6 +136,7 @@
       lastPos = mousePos;
     }
   }
+
   // Prevent scrolling when touching the canvas
   document.body.addEventListener("touchstart", function(e) {
     if (e.target == canvas) {
@@ -203,13 +153,16 @@
       e.preventDefault();
     }
   }, false);
+
   (function drawLoop() {
     requestAnimFrame(drawLoop);
     renderCanvas();
   })();
+
   function clearCanvas() {
     canvas.width = canvas.width;
   }
+
   // Set up the UI
   var sigText = document.getElementById("sig-dataUrl");
   var sigImage = document.getElementById("sig-image");
@@ -225,27 +178,9 @@
     sigText.innerHTML = dataUrl;
     sigImage.setAttribute("src", dataUrl);
   }, false);
+
 })();
-function myFunction(){
-var canvas = document.getElementById("sig-canvas");
- 
-var dataUrl = canvas.toDataURL();
-  window.parent.postMessage(
-        JSON.stringify({
-            event_code: "ym-client-event",
-            data: ({
-                event: {
-                    code: "data",
-                    data: {
-                        value: dataUrl
-                    },
-                },
-            }),
-        }),
-        "*"
-    );
- console.log(dataUrl)
-};
+
     
   </script> </body>
 </html>
